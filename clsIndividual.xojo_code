@@ -1,16 +1,49 @@
 #tag Class
 Protected Class clsIndividual
-	#tag Method, Flags = &h1
-		Protected Function Clone() As clsIndividual
+	#tag Method, Flags = &h0
+		Function Clone() As clsIndividual
 		  dim ClonedIndividual as new clsIndividual(me.X, me.Y)
 		  Return ClonedIndividual
 		End Function
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Sub Crossover(OtherParent as clsIndividual)
+	#tag Method, Flags = &h0
+		Sub Constructor(optional Xdef as Integer, optional Ydef as Integer)
+		  'If Xdef and Ydef are 0 it means we are creating a new (random) individual
+		  'If Xdef or Ydef are not 0 then we are cloning an existing individual
 		  
+		  
+		  If (Xdef+Ydef)>0 then
+		    me.X=Xdef
+		    me.Y=Ydef
+		  else
+		    Dim r as new Random
+		    me.X=r.InRange(0,RangeX)
+		    me.Y=r.InRange(0,RangeY)
+		  end if
+		  
+		  me.Evaluate
 		End Sub
+	#tag EndMethod
+
+	#tag Method, Flags = &h1
+		Protected Function Crossover(OtherParent as clsIndividual) As clsIndividual
+		  'This method will create a new individual take one value from each of the parents
+		  dim r as Random
+		  
+		  if r.InRange(0,100)>50 then
+		    Xcrossed=me.X
+		    Ycrossed=OtherParent.Y
+		  else
+		    Xcrossed=OtherParent.X
+		    Ycrossed=me.Y
+		  end if
+		  
+		  Dim CrossedIndividual as new clsIndividual(Xcrossed,Ycrossed)
+		  
+		  Return CrossedIndividual
+		  
+		End Function
 	#tag EndMethod
 
 	#tag Method, Flags = &h1
@@ -19,8 +52,8 @@ Protected Class clsIndividual
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Sub Mutate()
+	#tag Method, Flags = &h0
+		Sub Mutate()
 		  dim r as Random
 		  
 		  me.X=round(me.X+r.InRange(-100,100)/100*MutationRate)
@@ -34,12 +67,13 @@ Protected Class clsIndividual
 		    me.Y=round(RangeY*r.InRange(0,100)/100)
 		  end if
 		  
+		  me.Evaluate
 		End Sub
 	#tag EndMethod
 
 
-	#tag Property, Flags = &h1
-		Protected Value As Int64
+	#tag Property, Flags = &h0
+		Value As Int64
 	#tag EndProperty
 
 	#tag Property, Flags = &h21
