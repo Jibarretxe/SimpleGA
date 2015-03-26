@@ -26,10 +26,11 @@ Protected Class clsIndividual
 		End Sub
 	#tag EndMethod
 
-	#tag Method, Flags = &h1
-		Protected Function Crossover(OtherParent as clsIndividual) As clsIndividual
+	#tag Method, Flags = &h0
+		Function Crossover(OtherParent as clsIndividual) As clsIndividual
 		  'This method will create a new individual take one value from each of the parents
 		  dim r as Random
+		  Dim Xcrossed, Ycrossed as Integer
 		  
 		  if r.InRange(0,100)>50 then
 		    Xcrossed=me.X

@@ -703,12 +703,12 @@ Begin Window wMain
       Height          =   50
       Index           =   -2147483648
       InitialParent   =   ""
-      Left            =   299
+      Left            =   0
       LineColor       =   &c00000000
       LockedInPosition=   False
       Scope           =   0
       TabPanelIndex   =   0
-      Top             =   26
+      Top             =   0
       Visible         =   True
       Width           =   100
       X1              =   300
@@ -721,12 +721,12 @@ Begin Window wMain
       Height          =   50
       Index           =   -2147483648
       InitialParent   =   ""
-      Left            =   46
+      Left            =   0
       LineColor       =   &c00000000
       LockedInPosition=   False
       Scope           =   0
       TabPanelIndex   =   0
-      Top             =   163
+      Top             =   0
       Visible         =   True
       Width           =   100
       X1              =   46
@@ -760,7 +760,7 @@ End
 #tag Events pbStart
 	#tag Event
 		Sub Action()
-		  Dim i,j,PopulationSize, NumberOfCrosses, NumberOfClones as Integer
+		  Dim i,j,PopulationSize, NumberOfCrosses, NumberOfClones, EliteSize, NumberOfIterations, CurrentMaximum as Integer
 		  
 		  ///////////////////////////////////77
 		  'Initialize variables
@@ -808,7 +808,7 @@ End
 		  end if
 		  
 		  if val(txtNumberOfIterations.text)>0 then
-		    RangeX=val(txtNumberOfIterations.text)
+		    NumberOfIterations=val(txtNumberOfIterations.text)
 		  else
 		    FillAllParamMessage
 		    exit sub
@@ -854,7 +854,41 @@ End
 		      
 		      'Then mutate
 		      TempPopulation(j+EliteSize).Mutate
+		    next j 
+		    'Crossover. First generate a list of pairs to crossover, then do it
+		    dim r as new Random
+		    dim MatrixCross() as integer
+		    for j=1 to NumberOfCrosses
+		      MatrixCross.Append r.InRange(1,PopulationSize)
+		      MatrixCross.Append r.InRange(1,PopulationSize) 'twice to define a couple
 		    next j
+		    
+		    'Now we cross those selected individuals
+		    for j=1 to NumberOfCrosses
+		      TempPopulation.Append CurrentPopulation(MatrixCross(2*j-2)).Crossover(MatrixCross(2*j-1))
+		    next j
+		    
+		    'Finally, fill up the population matrix 
+		    for j=(EliteSize+NumberOfClones+NumberOfCrosses) to PopulationSize
+		      Dim TempIndividual as new clsIndividual
+		      TempPopulation.Append TempIndividual
+		    next j
+		    
+		    'Copy all individuals to the population matrix. Also, create the sorting array
+		    ReDim CurrentPopulation(-1)
+		    ReDim SortingArray(-1)
+		    
+		    for j=0 to PopulationSize-1
+		      CurrentPopulation.Append TempPopulation(j).Clone
+		      SortingArray.Append CurrentPopulation(j).Value
+		    next j
+		    
+		    'Now we need to sort the results according to their value, and pick the best so far
+		    SortingArray.SortWith(CurrentPopulation)
+		    CurrentMaximum=CurrentPopulation(PopulationSize-1).value
+		    
+		    system.DebugLog("Iteration: " + str(i) + "   Maximum: " + str(CurrentMaximum))
+		  next i
 		End Sub
 	#tag EndEvent
 #tag EndEvents
