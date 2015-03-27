@@ -18,6 +18,7 @@ Protected Class clsIndividual
 		    me.Y=Ydef
 		  else
 		    Dim r as new Random
+		    r.seed=Microseconds
 		    me.X=r.InRange(0,RangeX)
 		    me.Y=r.InRange(0,RangeY)
 		  end if
@@ -29,7 +30,8 @@ Protected Class clsIndividual
 	#tag Method, Flags = &h0
 		Function Crossover(OtherParent as clsIndividual) As clsIndividual
 		  'This method will create a new individual take one value from each of the parents
-		  dim r as Random
+		  dim r as new Random
+		  r.seed=Microseconds
 		  Dim Xcrossed, Ycrossed as Integer
 		  
 		  if r.InRange(0,100)>50 then
@@ -55,8 +57,8 @@ Protected Class clsIndividual
 
 	#tag Method, Flags = &h0
 		Sub Mutate()
-		  dim r as Random
-		  
+		  Dim r as new random
+		  r.seed=Microseconds
 		  me.X=round(me.X+r.InRange(-100,100)/100*MutationRate)
 		  me.Y=round(me.Y+r.InRange(-100,100)/100*MutationRate)
 		  
