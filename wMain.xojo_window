@@ -854,21 +854,24 @@ End
 		      
 		      'Then mutate
 		      TempPopulation(j+EliteSize).Mutate
-		    next j 
+		    next j
 		    'Crossover. First generate a list of pairs to crossover, then do it
 		    dim r as new Random
+		    r.seed=Microseconds
 		    dim MatrixCross() as integer
 		    for j=1 to NumberOfCrosses
-		      MatrixCross.Append r.InRange(1,PopulationSize)
-		      MatrixCross.Append r.InRange(1,PopulationSize) 'twice to define a couple
+		      MatrixCross.Append r.InRange(0,PopulationSize-1)
+		      r.seed=Microseconds+6
+		      MatrixCross.Append r.InRange(0,PopulationSize-1) 'twice to define a couple
 		    next j
 		    
 		    'Now we cross those selected individuals
 		    for j=1 to NumberOfCrosses
-		      TempPopulation.Append CurrentPopulation(MatrixCross(2*j-2)).Crossover(MatrixCross(2*j-1))
+		      TempPopulation.Append CurrentPopulation(MatrixCross(2*j-2)).Crossover(CurrentPopulation(MatrixCross(2*j-1)))
+		      
 		    next j
 		    
-		    'Finally, fill up the population matrix 
+		    'Finally, fill up the population matrix
 		    for j=(EliteSize+NumberOfClones+NumberOfCrosses) to PopulationSize
 		      Dim TempIndividual as new clsIndividual
 		      TempPopulation.Append TempIndividual
@@ -882,10 +885,13 @@ End
 		      CurrentPopulation.Append TempPopulation(j).Clone
 		      SortingArray.Append CurrentPopulation(j).Value
 		    next j
+		    Redim TempPopulation(-1)
 		    
 		    'Now we need to sort the results according to their value, and pick the best so far
 		    SortingArray.SortWith(CurrentPopulation)
-		    CurrentMaximum=CurrentPopulation(PopulationSize-1).value
+		    if CurrentMaximum<CurrentPopulation(PopulationSize-1).value then
+		      CurrentMaximum=CurrentPopulation(PopulationSize-1).value
+		    end if
 		    
 		    system.DebugLog("Iteration: " + str(i) + "   Maximum: " + str(CurrentMaximum))
 		  next i
